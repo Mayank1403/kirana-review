@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Appbar, Navbar, About, Home ,Review} from "./components";
+import { Appbar, Navbar, About, Home, Review, Search } from "./components";
 import styles from "./App.module.css";
-import {products} from "./Shared/Products";
+import { products } from "./Shared/Products";
 import { useLocation } from "react-router-dom";
+import SearchContext, { SearchContextProvider } from "./Context/searchContext";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -14,8 +15,6 @@ function ScrollToTop() {
 
   return null;
 }
-  
-  
 
 const App = () => {
   function setBackground() {
@@ -31,35 +30,45 @@ const App = () => {
       document.getElementById("navbar").style.boxShadow = "none";
     }
   }
- 
+
   useEffect(() => {
     function watchScroll() {
       window.addEventListener("scroll", setBackground);
-
     }
     watchScroll();
-   
+
     return () => {
       window.removeEventListener("scroll", setBackground);
     };
   }, []);
 
-   const ReviewWithId = ({match}) =>{
-     return <Review product ={products.filter((product)=>product.id === parseInt(match.params.id,10))[0]} 
-     products={products} /> ;
-   }
+  const ReviewWithId = ({ match }) => {
+    return (
+      <Review
+        product={
+          products.filter(
+            (product) => product.id === parseInt(match.params.id, 10)
+          )[0]
+        }
+        products={products}
+      />
+    );
+  };
   return (
-    <Router>
-      <ScrollToTop/>
-      <div className={styles.navbar} id="navbar">
-        <Navbar />
-      </div>
-      <Switch>
-        <Route path="/" exact component={Home} />
-        <Route path="/about" component={About} />
-        <Route path="/Review/:id" exact component={ReviewWithId}/>
-      </Switch>
-    </Router>
+    <SearchContextProvider>
+      <Router>
+        <ScrollToTop />
+        <div className={styles.navbar} id="navbar">
+          <Navbar />
+        </div>
+        <Switch>
+          <Route path="/" exact component={Home} />
+          <Route path="/about" component={About} />
+          <Route path="/Review/:id" exact component={ReviewWithId} />
+          <Route path="/search/:keyword" exact component={Search} />
+        </Switch>
+      </Router>
+    </SearchContextProvider>
   );
 };
 
